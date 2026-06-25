@@ -14,12 +14,30 @@ podman ps -a
 rm -rf ./grafana/image-mapped-folders/*
 ```
 
+### Остановить и удалить
+```shell
+clear
+podman compose down
+podman ps -a
+```
+
+### Состояние
+```shell
+clear
+podman ps -a
+```
 
 ### Запускаем 
 ```shell
 clear
 podman compose up -d
 podman ps -a
+```
+### Утилиты
+```shell
+clear
+podman exec -it netshoot sh 
+# exit
 ```
 
 ### Логи последние 100 строк за последний час

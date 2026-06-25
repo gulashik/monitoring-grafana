@@ -1,7 +1,7 @@
 services:
   grafana:
     container_name: grafana
-    image: grafana/grafana:11.6.15-ubuntu
+    image: grafana/grafana:13.1.0
     volumes:
       # завязались на локальные папку
       - './grafana/image-mapped-folders/grafana-data:/var/lib/grafana'
@@ -210,6 +210,13 @@ services:
       - NTFY_BASE_URL=http://localhost:8888
     ports:
       - '8888:80'
+    networks:
+      - monitoring
+
+  netshoot:
+    container_name: netshoot
+    image: nicolaka/netshoot:v0.15
+    command: ["sleep", "infinity"]
     networks:
       - monitoring
 
