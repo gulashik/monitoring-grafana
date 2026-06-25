@@ -1,0 +1,62 @@
+# Валидация правил
+# Шаблон promtool check rules alert.rules.yml
+# Проверка через контейнер без скачивания локально
+#   podman cp "/path/to/file/prometheus/alert.rules.yml" prometheus_container:/tmp/alert.rules.yml
+#   podman exec -it prometheus_container ls -l /tmp
+#   podman exec -it prometheus_container promtool check rules /tmp/alert.rules.yml
+
+groups:
+  - name: example_alerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "{{ $labels.instance }} недоступен более 1 минуты."
+
+      - alert: NginxDown
+        expr: nginx_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nginx is down"
+          description: "Nginx on {{ $labels.instance }} is down."
+
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Postgres is down"
+          description: "Postgres on {{ $labels.instance }} is down."
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая загрузка CPU на {{ $labels.instance }}"
+          description: "CPU > 80% уже 10 минут (текущее: {{ printf \"%.1f\" $value }}%)."
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокое потребление памяти на {{ $labels.instance }}"
+
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая загрузка диска на {{ $labels.instance }}"
+          description: "На устройстве {{ $labels.device }} (точка монтирования {{ $labels.mountpoint }}) свободно менее 10% ({{ $value | humanize }}%). Instance: {{ $labels.instance }}"

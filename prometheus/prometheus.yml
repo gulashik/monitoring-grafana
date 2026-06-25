@@ -1,0 +1,55 @@
+# Валидация конфига
+# Шаблон `promtool check config prometheus.yml`
+# Проверка через контейнер без скачивания локально
+#   podman cp "/path/to/file/prometheus/prometheus.yml" prometheus_container:/tmp/prometheus.yml
+#   podman exec -it prometheus_container ls -l /tmp
+#   podman exec -it prometheus_container promtool check config /tmp/prometheus.yml
+
+# Глобальные настройки
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  # В вышестоящем Prometheus Server будет виден в каждой метрики доп label region="prometheus-low-level-for-federation"
+  # без external_labels будет невозможно понять, из какой зоны или кластера пришла метрика.
+  external_labels:
+    region: 'prometheus-low-level-for-federation'
+
+# Настройка Alertmanager
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"
+
+# Подключение правил (алерты, recording rules) из других файлов. Папки в контейнере. Смотрим на маппинг в compose.
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+  # или явно файл - 'rules/alert.rules.yml'
+
+# Что именно мониторить — основной раздел
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"] # Используем как адресс node-exporter т.к. в compose указываем сеть
+
+  - job_name: "node-exporter2"
+    static_configs:
+      - targets: ["node-exporter2:9100"] # Используем как адресс node-exporter т.к. в compose указываем сеть
+
+  - job_name: "nginx-exporter"
+    static_configs:
+      - targets: ["nginx-exporter:9113"] # Используем как адресс node-exporter т.к. в compose указываем сеть
+
+  - job_name: "postgres-exporter"
+    static_configs:
+      - targets: ["postgres-exporter:9187"] # Используем как адресс node-exporter т.к. в compose указываем сеть
+
+  - job_name: "pushgateway"
+    static_configs:
+      - targets:
+          - "pushgateway:9091" # Используем как адресс node-exporter т.к. в compose указываем сеть

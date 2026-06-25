@@ -1,0 +1,11 @@
+{{ define "telegram.custom.message" -}}
+  {{ if eq .Status "firing" }}🔥 <b>FIRING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
+  {{ range .Alerts }}
+<b>{{ .Labels.alertname }}</b>
+Severity: {{ .Labels.severity }}
+{{ .Annotations.summary }}
+{{ .Annotations.description }}
+Instance: {{ .Labels.instance }}
+Time: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+  {{ end }}
+{{- end }}

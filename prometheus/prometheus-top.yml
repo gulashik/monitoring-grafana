@@ -1,0 +1,25 @@
+# Настройка Federation
+#   Federation — это механизм, который позволяет одному Prometheus забирать метрики из другого Prometheus.
+# Суть при указании ключа external_labels при экспорте из дочернего Prometheus Server через endpoint /federation
+#   для каждой метрики будет добавлен label со значениями из external_labels region="prometheus-low-level-for-federation"
+#	В вышестоящем Prometheus Server можем использовать такие label-ы в фильтрации.
+#   Без external_labels будет невозможно понять, из какой зоны или кластера пришла метрика.
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  - job_name: 'federation'
+    honor_labels: true
+    # Специальный эндпоинт в Prometheus, который отдаёт метрики в режиме федерации.
+    # Возвращает только те метрики, которые подходят под условия в match[]
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        # Набор фильтров, определяющих какие метрики нужно забрать. Здесь перечисляются лейблы и их значения
+        # __name__ - имя метрики
+        - '{__name__=~".+"}' # все метрики
+
+    static_configs:
+      - targets:
+          - 'prometheus:9090'

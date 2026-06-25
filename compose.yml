@@ -1,0 +1,224 @@
+services:
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:11.6.15-ubuntu
+    volumes:
+      # завязались на локальные папку
+      - './grafana/image-mapped-folders/grafana-data:/var/lib/grafana'
+      #  хранение datasource, dashboards и alerting-конфиги как код
+      # структура папок
+      # provisioning/
+      #   datasources/datasources.yml
+      #   dashboards/dashboards.yml
+      #   alerting/alert_rules.yml
+      #   notifiers/notifiers.yml
+      - './grafana/provisioning:/etc/grafana/provisioning:ro'
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres-metrics-db:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+    # if you are running as root then set it to 0
+    # else find the right id with the id -u command like "$(id -u):$(id -g)"
+    # else default grafana user is 472 use command `sudo chown -R 472:472 grafana-data`
+    # else use named volume see below `volumes: grafana-data:`
+    user: "0:0"
+    environment:
+      # по умолчанию так и есть login admin pass admin
+      GF_SECURITY_ADMIN_USER: "admin"
+      # Если Grafana уже запустилась и создала пользователя admin, а потом поменяли переменную — пароль не изменится автоматически, потому что пользователь уже сохранён в базе Grafana.
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}" # если пароль не задан, то admin
+      GF_SECURITY_DISABLE_GRAVATAR: "true" # Gravatar — внешний сервис, который по email может возвращать аватар пользователя
+      GF_AUTH_ANONYMOUS_ENABLED: "false" # запретить анонимный доступ
+      GF_USERS_ALLOW_SIGN_UP: "false" # пользователей должен создавать Администратор
+      GF_USERS_ALLOW_ORG_CREATE: "false" # запретить создание новых организаций
+      GF_DATE_FORMATS_DEFAULT_TIMEZONE: "Europe/Moscow" # фиксировать timezone. Для production удобно "UTC"
+      GF_ANALYTICS_REPORTING_ENABLED: "false" # отключить отправку аналитики в Grafana Labs
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false" # отключить проверку обновлений. Версия всё равно закреплена в Docker image
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false" # отключить проверку обновлений плагинов. Версии плагинов должны быть строго контролируемыми
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:v3.5.4
+    container_name: prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      # bind mount: локальные файлы конфигурации пробрасываются внутрь контейнера
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules/actual_rules:/etc/prometheus/rules:ro
+      # named volume: prometheus_data, куда Prometheus пишет свою базу time-series.
+      - prometheus_data:/prometheus 
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle" # перезапустить curl -X POST http://localhost:9090/-/reload
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  prometheus-federation:
+    image: prom/prometheus:v3.5.4
+    container_name: prometheus-federation
+    ports:
+      - '9099:9090'
+    volumes:
+      # bind mount: локальные файлы конфигурации пробрасываются внутрь контейнера
+      - ./prometheus/prometheus-top.yml:/etc/prometheus/prometheus.yml:ro
+      # named volume: prometheus_fed_data, куда Prometheus пишет свою базу time-series.
+      - prometheus_fed_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle" # перезапустить curl -X POST http://localhost:9099/-/reload
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager:v0.33.0
+    volumes:
+      - ./prometheus/alerts/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./prometheus/alerts/templates:/etc/alertmanager/templates:ro
+    ports:
+      - '9093:9093'
+    environment:
+      - '--config.file=/etc/alertmanager/alertmanager.yml' # по умолчанию так и есть. Путь к файлу конфигурации Alertmanager.
+      - '--storage.path=/alertmanager' # по умолчанию так и есть. Путь к директории для хранения данных Alertmanager.
+      - '--web.listen-address=:9093' # по умолчанию так и есть. Адрес и порт, на которых Alertmanager слушает HTTP-запросы.
+      - '--web.route-prefix=/alertmanager' # по умолчанию так и есть. Префикс URL-адреса для Alertmanager.
+    networks:
+      - monitoring
+
+  pushgateway:
+    container_name: pushgateway
+    image: prom/pushgateway:v1.11.1
+    ports:
+      - '9091:9091'
+    networks:
+      - monitoring
+
+  # node-exporter - собирает метрики хоста (CPU, память, диск, сеть, файловые системы) и отдаёт их в формате Prometheus по `/metrics`.
+  node-exporter:
+    image: prom/node-exporter:v1.11.1
+    container_name: node-exporter
+    ports:
+      - '9100:9100'
+    command:
+      - "--path.rootfs=/host" # замапленный /host на read only папку /
+    # --web.telemetry-path="/node" - отдавать по url. По умолчанию /metrics
+    volumes:
+      - /:/host:ro,rslave # мапим / на /host
+    restart: unless-stopped
+    networks:
+      - monitoring
+  
+  node-exporter2:
+    image: prom/node-exporter:v1.11.1
+    container_name: node-exporter2
+    ports:
+      - '9101:9100'
+    command:
+      - "--path.rootfs=/host" # замапленный /host на read only папку /
+    # --web.telemetry-path="/node" - отдавать по url. По умолчанию /metrics
+    volumes:
+      - /:/host:ro,rslave # мапим / на /host
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.31.2
+    ports:
+      - '8080:80'
+    volumes:
+      - './nginx/server.conf:/etc/nginx/conf.d/default.conf'
+    networks:
+      - monitoring
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.5.1
+    container_name: nginx-exporter
+    depends_on:
+      - nginx
+    ports:
+      - '9113:9113'
+    command:
+      - '--nginx.scrape-uri=http://nginx:80/stub_status'
+    networks:
+      - monitoring
+
+  postgres-metrics-db:
+    container_name: postgres-metrics-db
+    image: postgres:17.5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: metrics_db
+    volumes:
+      # накатываем скрипты при старте
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d metrics_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - monitoring
+
+  postgres:
+    container_name: postgres
+    image: postgres:17.5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - '5433:5432'
+    networks:
+      - monitoring
+
+  postgres-exporter:
+    container_name: postgres-exporter
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    depends_on:
+      - postgres
+    ports:
+      - '9187:9187'
+    environment:
+      # подключения к базе: postgresql://<юзер>:<пароль>@<хост>:<порт>/<база данных>
+      DATA_SOURCE_NAME: "postgresql://postgres:password@postgres:5432/postgres?sslmode=disable"
+    networks:
+      - monitoring
+
+  ntfy:
+    container_name: ntfy
+    image: binwiederhier/ntfy:v2.11.0
+    command:
+      - serve
+    environment:
+      - NTFY_BASE_URL=http://localhost:8888
+    ports:
+      - '8888:80'
+    networks:
+      - monitoring
+
+volumes:
+  prometheus_data: # named volume: Docker создаёт и управляет им сам
+  prometheus_fed_data:
+  postgres_data:
+  #grafana-data:
+
+networks:
+  monitoring:
+    driver: bridge 

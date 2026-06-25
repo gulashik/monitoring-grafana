@@ -1,0 +1,19 @@
+groups:
+  - name: node
+    interval: 15s           # (опционально) если указан, переопределит глобальный evaluation_interval
+    rules:
+      - alert: HighCPU      # имя алерта
+        expr: <PromQL>      # условие, при котором алерт должен сработать
+        for: 5m             # сколько времени условие должно выполняться, прежде чем алерт будет отправлен
+        labels:             # дополнительные лейблы, помогают маршрутизировать алерт в Alertmanager
+          severity: warning
+        annotations:        # текст для человека: краткое описание, что за алерт, почему сработал, поддерживает шаблоны {{ $labels.X }}, {{ $value }}
+          summary: "..."
+          description: "..."
+# $labels - Набор всех лейблов временного ряда, по которому сработал алерт. Например, у node_cpu_seconds_total{instance="server1.example.com", mode="user"}
+# {{ $labels.instance }} = server1.example.com
+# {{ $labels.mode }} = user
+# --
+# $value: Текущее значение выражения expr, которое вызвало алерт.
+# В шаблонах можно использовать стандартные функции Go template language
+# например: description: "За последние 5 минут CPU загружен на {{ printf \"%.1f\" $value }}%"
