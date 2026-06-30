@@ -38,6 +38,8 @@ services:
       GF_ANALYTICS_REPORTING_ENABLED: "false" # отключить отправку аналитики в Grafana Labs
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false" # отключить проверку обновлений. Версия всё равно закреплена в Docker image
       GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false" # отключить проверку обновлений плагинов. Версии плагинов должны быть строго контролируемыми
+      # Plugins
+      GF_INSTALL_PLUGINS: "yesoreyeram-infinity-datasource" # экспорт из JSON, CSV, TSV, XML, GraphQL endpoints
     networks:
       - monitoring
 

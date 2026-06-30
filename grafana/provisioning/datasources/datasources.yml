@@ -29,3 +29,20 @@ datasources:
       sslmode: disable
     secureJsonData:
       password: postgres
+
+  - name: infinity-json-placeholder
+    type: yesoreyeram-infinity-datasource
+    uid: infinity-json-placeholder
+    typeName: "Infinity"
+    access: proxy
+    url: "https://jsonplaceholder.typicode.com"
+    user: ""
+    database: ""
+    basicAuth: false
+    isDefault: false
+    editable: true
+    jsonData:
+      global_queries: []
+      pdcInjected: false
+    secureJsonData:
+      password: ""
