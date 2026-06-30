@@ -9,6 +9,15 @@ providers:
     editable: true
     updateIntervalSeconds: 30
     options:
-      path: /etc/grafana/provisioning/dashboards # замапили папку с .json в compose.yml
+      path: /etc/grafana/provisioning/dashboards/node-exporters-folder # замапили папку provisioning в compose.yml
       foldersFromFilesStructure: false
-
+  - name: json-dashboards
+    orgId: 1
+    folder: JSON
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/json-folder # замапили папку provisioning в compose.yml
+      foldersFromFilesStructure: false
