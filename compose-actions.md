@@ -1,10 +1,3 @@
-### Остановить и удалить
-```shell
-clear
-podman compose down
-podman ps -a
-```
-
 ### Остановить и удалить + удалить volume с данными
 ```shell
 podman compose down -v
@@ -12,13 +5,6 @@ podman ps -a
 ```
 ```shell
 rm -rf ./grafana/image-mapped-folders/*
-```
-
-### Остановить и удалить
-```shell
-clear
-podman compose down
-podman ps -a
 ```
 
 ### Состояние
@@ -33,7 +19,18 @@ clear
 podman compose up -d
 podman ps -a
 ```
+
 ### Утилиты
+
+### Генерация CSV файла. 
+```shell
+clear
+chmod +x ./compose-generate-testdata.sh
+OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdata.sh
+# ctrl+c
+# ps aux | grep '[c]ompose-generate-testdata' и потом kill -9 <pid>
+```
+
 ```shell
 clear
 podman exec -it netshoot sh 
@@ -102,9 +99,4 @@ EOF
 # Удаление метрик по группирующему ключу в Pushgateway 
 # Pushgateway НЕ УДАЛЯЕТ метрики автоматически. Если они больше не нужны, это придется сделать вручную.
 curl -XDELETE http://localhost:9091/metrics/job/gitlab-ci/branch/main/project/prometheus
-```
-
-### Логи последние 100 строк за последний час
-```shell
-podman compose logs -f --tail 100 --since 1h 
 ```

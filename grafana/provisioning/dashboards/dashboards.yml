@@ -21,3 +21,13 @@ providers:
     options:
       path: /etc/grafana/provisioning/dashboards/json-folder # замапили папку provisioning в compose.yml
       foldersFromFilesStructure: false
+  - name: csv-dashboards
+    orgId: 1
+    folder: CSV
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/csv-folder # замапили папку provisioning в compose.yml
+      foldersFromFilesStructure: false

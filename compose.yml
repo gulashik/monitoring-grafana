@@ -13,6 +13,10 @@ services:
       #   alerting/alert_rules.yml
       #   notifiers/notifiers.yml
       - './grafana/provisioning:/etc/grafana/provisioning:ro'
+      # для сгенерируемых файлов будем использовать в Grafana(dashboard, datasource, alerting-rules etc)
+      #   файлы доступны для внешних запросов, например http://localhost:3000/public/testdata/live_metric.csv
+      - './grafana/public/testdata:/usr/share/grafana/public/testdata:ro'
+
     ports:
       - '3000:3000'
     depends_on:

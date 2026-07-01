@@ -46,3 +46,25 @@ datasources:
       pdcInjected: false
     secureJsonData:
       password: ""
+
+  - name: infinity-csv-script-live-metric
+    type: yesoreyeram-infinity-datasource
+    uid: infinity-csv-script-live-metric
+    typeName: "Infinity"
+    access: proxy
+    url: "http://grafana:3000/public/testdata/live_metric.csv"
+    user: ""
+    database: ""
+    basicAuth: false
+    isDefault: false
+    editable: true
+    jsonData:
+      global_queries: []
+      pdcInjected: false
+    secureJsonData:
+      password: ""
+
+  - name: testdata-datasource
+    type: testdata
+    access: proxy
+    isDefault: false
