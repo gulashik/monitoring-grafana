@@ -1,0 +1,1 @@
+Папка для подкладывания CSV файлов для TestData datasource
