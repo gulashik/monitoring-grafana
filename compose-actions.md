@@ -19,9 +19,10 @@ clear
 podman compose up -d
 podman ps -a
 ```
-
-### Утилиты
-
+### Включение источник для "prometheus-alertmanager-datasource" если нужно
+```shell
+open http://localhost:3000/alerting/admin/alertmanager
+```
 ### Генерация CSV файла. 
 ```shell
 clear
@@ -30,7 +31,48 @@ OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdat
 # ctrl+c
 # ps aux | grep '[c]ompose-generate-testdata' и потом kill -9 <pid>
 ```
+### Сделать Alert editable, если нужно.
+```shell
+clear
+chmod +x ./compose-generate-testdata.sh
+./grafana/provisioning/alerting/create-editable-nginx-alert.sh
+```
 
+### Демонстрация Grafana Alerting
+```shell
+# отключаем сервис
+clear
+podman stop nginx-exporter
+podman ps -a --filter "name=nginx" --filter "status=exited"  --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"
+```
+```shell
+# через пару минут в Grafana видим статус Firing 
+open http://localhost:3000/alerting/grafana/nginx-exporter-down-grafana/view
+```
+```shell
+# через пару минут в Prometheus видим статус Firing. ОТДЕЛЬНАЯ НАСТРОЙКА БЫЛА!
+open http://localhost:8888/prometheus-alerts
+```
+```shell
+# через пару минут в NTFY увидим уведомления от Alertmanager(Prometheus) и Grafana(Alert rules)
+open http://localhost:8888/grafana-alerts
+```
+```shell
+# вернуть нормальное состояние
+clear
+podman start nginx-exporter
+podman ps -a --filter "name=nginx-exporter" --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"
+```
+```shell
+# через пару минут в Grafana видим статус Normal 
+open http://localhost:3000/alerting/grafana/nginx-exporter-down-grafana/view
+```
+```shell
+# через пару минут в Prometheus видим статус Normal. ОТДЕЛЬНАЯ НАСТРОЙКА БЫЛА!
+open http://localhost:9090/alerts
+```
+
+### Утилиты
 ```shell
 clear
 podman exec -it netshoot sh 
@@ -68,7 +110,7 @@ open http://localhost:9093
 ```
 ```shell
 # notify от allertmanager
-open http://localhost:8888/alerts
+open http://localhost:8888/prometheus-alerts
 ```
 
 ```shell

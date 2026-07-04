@@ -94,11 +94,10 @@ services:
       - ./prometheus/alerts/templates:/etc/alertmanager/templates:ro
     ports:
       - '9093:9093'
-    environment:
-      - '--config.file=/etc/alertmanager/alertmanager.yml' # по умолчанию так и есть. Путь к файлу конфигурации Alertmanager.
-      - '--storage.path=/alertmanager' # по умолчанию так и есть. Путь к директории для хранения данных Alertmanager.
-      - '--web.listen-address=:9093' # по умолчанию так и есть. Адрес и порт, на которых Alertmanager слушает HTTP-запросы.
-      - '--web.route-prefix=/alertmanager' # по умолчанию так и есть. Префикс URL-адреса для Alertmanager.
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.listen-address=:9093'
     networks:
       - monitoring
 

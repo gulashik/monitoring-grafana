@@ -21,5 +21,5 @@ inhibit_rules:
 receivers:
   - name: 'ntfy'
     webhook_configs:
-      - url: 'http://ntfy:80/alerts?template=yaml'
+      - url: 'http://ntfy:80/prometheus-alerts?template=yaml'
         send_resolved: true

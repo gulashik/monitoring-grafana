@@ -10,6 +10,8 @@ datasources:
     editable: true
     jsonData:
       httpMethod: POST
+      alertmanagerUid: efr3nt8rv9y4gf
+      alerting: true
 
   - name: grafana-postgresql-datasource
     type: postgres
@@ -68,3 +70,20 @@ datasources:
     type: testdata
     access: proxy
     isDefault: false
+
+  - name: prometheus-alertmanager-datasource
+    type: alertmanager
+    uid: efr3nt8rv9y4gf
+    typeName: Alertmanager
+    access: proxy
+    url: "http://alertmanager:9093"
+    user: ""
+    database: ""
+    basicAuth: false
+    isDefault: false
+    editable: true
+    jsonData:
+      handleGrafanaManagedAlerts: true
+      implementation: "prometheus"
+      pdcInjected: false
+      alerting: true
