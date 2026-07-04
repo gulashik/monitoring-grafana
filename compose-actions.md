@@ -19,10 +19,7 @@ clear
 podman compose up -d
 podman ps -a
 ```
-### Включение источник для "prometheus-alertmanager-datasource" если нужно
-```shell
-open http://localhost:3000/alerting/admin/alertmanager
-```
+
 ### Генерация CSV файла. 
 ```shell
 clear
@@ -31,14 +28,20 @@ OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdat
 # ctrl+c
 # ps aux | grep '[c]ompose-generate-testdata' и потом kill -9 <pid>
 ```
+
+### Демонстрация Grafana Alerting
+### Проверка включения "prometheus-alertmanager-datasource"
+После старта `grafana-alertmanager-init` автоматически включает доставку Grafana-managed alerts во внешний Alertmanager.
+```shell
+open http://localhost:3000/alerting/admin/alertmanager
+```
 ### Сделать Alert editable, если нужно.
 ```shell
 clear
 chmod +x ./compose-generate-testdata.sh
 ./grafana/provisioning/alerting/create-editable-nginx-alert.sh
 ```
-
-### Демонстрация Grafana Alerting
+### Действия по алертам
 ```shell
 # отключаем сервис
 clear

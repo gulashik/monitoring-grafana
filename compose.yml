@@ -47,6 +47,33 @@ services:
     networks:
       - monitoring
 
+  # Костыль для включения внешнего Alertmanager от Prometheus
+  grafana-alertmanager-init:
+    container_name: grafana-alertmanager-init
+    image: nicolaka/netshoot:v0.15
+    depends_on:
+      grafana:
+        condition: service_started
+      alertmanager:
+        condition: service_started
+    environment:
+      GRAFANA_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+        until curl -fsS -u "admin:$${GRAFANA_ADMIN_PASSWORD}" http://grafana:3000/api/health >/dev/null; do
+          sleep 2
+        done
+        curl -fsS -u "admin:$${GRAFANA_ADMIN_PASSWORD}" \
+          -H 'Content-Type: application/json' \
+          -X POST http://grafana:3000/api/v1/ngalert/admin_config \
+          -d '{"alertmanagersChoice":"all"}'
+    restart: "no"
+    networks:
+      - monitoring
+
   prometheus:
     image: prom/prometheus:v3.5.4
     container_name: prometheus
@@ -233,4 +260,4 @@ volumes:
 
 networks:
   monitoring:
-    driver: bridge 
+    driver: bridge
