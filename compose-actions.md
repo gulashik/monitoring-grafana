@@ -6,7 +6,7 @@ open http://localhost:9090/targets
 open http://localhost:9099/targets
 
 # grafana
-# по умолчанию так и есть login: admin pass: admin
+# по умолчанию login: admin pass: admin
 open http://localhost:3000
 
 # pushgateway
@@ -14,6 +14,7 @@ open http://localhost:9091
 
 # allertmanager общая ссылка
 open http://localhost:9093
+
 # notify от allertmanager по prometheus
 open http://localhost:8888/prometheus-alerts
 # notify от allertmanager по grafana
