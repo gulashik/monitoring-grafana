@@ -11,7 +11,6 @@ services:
       #   datasources/datasources.yml
       #   dashboards/dashboards.yml
       #   alerting/alert_rules.yml
-      #   notifiers/notifiers.yml
       - './grafana/provisioning:/etc/grafana/provisioning:ro'
       # для сгенерируемых файлов будем использовать в Grafana(dashboard, datasource, alerting-rules etc)
       #   файлы доступны для внешних запросов, например http://localhost:3000/public/testdata/live_metric.csv
