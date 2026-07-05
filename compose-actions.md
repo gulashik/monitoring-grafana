@@ -34,6 +34,7 @@ clear
 podman ps -a
 ps aux | grep '[c]ompose-generate-testdata' 
 ps aux | grep '[i]nsert-metrics' 
+ps aux | grep '[i]nsert-business-metrics' 
 ```
 ```shell
 # остановка генерации если нужно
