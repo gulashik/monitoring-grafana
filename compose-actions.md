@@ -42,10 +42,9 @@ clear
 podman compose up -d
 podman ps -a
 # включение доставки Grafana-managed alerts во внешний Alertmanager. Нужно подождать.
-#  или можно вручную в настройках Home -> Alerting -> Settings -> нажать Enable "prometheus-alertmanager-datasource"
+#  или можно вручную в настройках Home - Alerting - Settings - нажать Enable "prometheus-alertmanager-datasource"
 chmod +x ./grafana/provisioning/datasources/setup-external-alertmanager.sh
 ./grafana/provisioning/datasources/setup-external-alertmanager.sh
-
 ```
 
 ### Генерация CSV файла. 
