@@ -24,10 +24,8 @@ open http://localhost:8888/grafana-alerts
 ### Остановить и удалить + удалить volume с данными
 ```shell
 podman compose down -v
-podman ps -a
-```
-```shell
 rm -rf ./grafana/image-mapped-folders/*
+podman ps -a
 ```
 
 ### Состояние
@@ -57,6 +55,8 @@ chmod +x ./grafana/provisioning/datasources/setup-external-alertmanager.sh
 # включение автогенерации данных в таблицы БД Postgres
 chmod +x ./postgres/generator/insert-metrics.sh
 ./postgres/generator/insert-metrics.sh &
+chmod +x ./postgres/generator/insert-business-metrics.sh
+./postgres/generator/insert-business-metrics.sh &
 
 # генерация CSV файла
 chmod +x ./compose-generate-testdata.sh

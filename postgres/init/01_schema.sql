@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS business_metrics (
-    day DATE PRIMARY KEY,
+    day TIMESTAMP PRIMARY KEY,
     visitors INTEGER NOT NULL,
     leads INTEGER NOT NULL,
     orders INTEGER NOT NULL,
@@ -70,6 +70,47 @@ BEGIN
             SELECT id
             FROM grafana_demo_metrics
             ORDER BY measured_at DESC, id DESC
+            OFFSET 1024
+        );
+
+        COMMIT;
+
+        PERFORM pg_sleep(random() * 4 + 1);
+    END LOOP;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE insert_business_metrics()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    LOOP
+        INSERT INTO business_metrics (
+            day,
+            visitors,
+            leads,
+            orders,
+            revenue,
+            conversion_rate,
+            cac,
+            ltv
+        )
+        VALUES (
+                   now(),
+            floor(random() * 1000 + 500)::INTEGER,
+            floor(random() * 100 + 50)::INTEGER,
+            floor(random() * 30 + 10)::INTEGER,
+            round((random() * 100000 + 50000)::NUMERIC, 2),
+            round((random() * 0.05 + 0.01)::NUMERIC, 4),
+            round((random() * 500 + 500)::NUMERIC, 2),
+            round((random() * 2000 + 5000)::NUMERIC, 2)
+        );
+
+        DELETE FROM business_metrics
+        WHERE CTID IN (
+            SELECT CTID
+            FROM business_metrics
+            ORDER BY DAY DESC
             OFFSET 1024
         );
 
