@@ -30,9 +30,25 @@ OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdat
 ```
 
 ### Демонстрация Grafana Alerting
-### Проверка включения "prometheus-alertmanager-datasource"
-После старта контейнер `grafana-alertmanager-init` автоматически включает доставку Grafana-managed alerts во внешний Alertmanager.
+### Включение доставки алертов во внешний Alertmanager
+Используем контейнер `netshoot` для включения доставки Grafana-managed alerts во внешний Alertmanager.
 или можно вручную в настройках Home -> Alerting -> Settings -> нажать Enable "prometheus-alertmanager-datasource"
+```shell
+podman exec -it netshoot sh -c '
+GRAFANA_PASS=${GRAFANA_ADMIN_PASSWORD:-admin}
+until curl -fsS -u "admin:$GRAFANA_PASS" http://grafana:3000/api/health >/dev/null; do
+  echo "Waiting for Grafana..."
+  sleep 2
+done
+curl -fsS -u "admin:$GRAFANA_PASS" \
+  -H "Content-Type: application/json" \
+  -X POST http://grafana:3000/api/v1/ngalert/admin_config \
+  -d "{\"alertmanagersChoice\":\"all\"}"
+'
+```
+### Проверка включения "prometheus-alertmanager-datasource"
+Можно вручную в настройках Home -> Alerting -> Settings -> нажать Enable "prometheus-alertmanager-datasource"
+или проверить через интерфейс:
 ```shell
 open http://localhost:3000/alerting/admin/alertmanager
 ```
