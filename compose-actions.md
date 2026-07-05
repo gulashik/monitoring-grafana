@@ -35,30 +35,34 @@ rm -rf ./grafana/image-mapped-folders/*
 clear
 podman ps -a
 ps aux | grep '[c]ompose-generate-testdata' 
+ps aux | grep '[i]nsert-metrics' 
+```
+```shell
+# остановка генерации если нужно
+# ps aux и потом через kill -9 <pid> <pid>
+clear
+ps aux | grep '[c]ompose-generate-testdata' 
 ```
 
 ### Запускаем 
 ```shell
 clear
 podman compose up -d
-podman ps -a
-# включение доставки Grafana-managed alerts во внешний Alertmanager. Нужно подождать.
+
+# включение доставки Grafana-managed alerts во внешний Alertmanager.
 #  или можно вручную в настройках Home - Alerting - Settings - нажать Enable "prometheus-alertmanager-datasource"
 chmod +x ./grafana/provisioning/datasources/setup-external-alertmanager.sh
 ./grafana/provisioning/datasources/setup-external-alertmanager.sh
-```
 
-### Генерация CSV файла. 
-```shell
-clear
+# включение автогенерации данных в таблицы БД Postgres
+chmod +x ./postgres/generator/insert-metrics.sh
+./postgres/generator/insert-metrics.sh &
+
+# генерация CSV файла
 chmod +x ./compose-generate-testdata.sh
 OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdata.sh &
-```
-```shell
-# остановка генерации 
-# ps aux и потом через kill -9 <pid> <pid>
-clear
-ps aux | grep '[c]ompose-generate-testdata' 
+
+podman ps -a
 ```
 
 ### Демонстрация Grafana Alerting

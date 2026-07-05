@@ -26,8 +26,7 @@ CREATE TABLE IF NOT EXISTS grafana_demo_metrics (
 CREATE INDEX IF NOT EXISTS grafana_demo_metrics_measured_at_idx
     ON grafana_demo_metrics (measured_at);
 
-CREATE OR REPLACE FUNCTION insert_grafana_demo_metric()
-RETURNS void
+CREATE OR REPLACE PROCEDURE insert_grafana_demo_metric()
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -73,6 +72,8 @@ BEGIN
             ORDER BY measured_at DESC, id DESC
             OFFSET 1024
         );
+
+        COMMIT;
 
         PERFORM pg_sleep(random() * 4 + 1);
     END LOOP;
