@@ -11,6 +11,7 @@ rm -rf ./grafana/image-mapped-folders/*
 ```shell
 clear
 podman ps -a
+ps aux | grep '[c]ompose-generate-testdata' 
 ```
 
 ### Запускаем 
@@ -18,6 +19,11 @@ podman ps -a
 clear
 podman compose up -d
 podman ps -a
+# включение доставки Grafana-managed alerts во внешний Alertmanager. Нужно подождать.
+#  или можно вручную в настройках Home -> Alerting -> Settings -> нажать Enable "prometheus-alertmanager-datasource"
+chmod +x ./grafana/provisioning/datasources/setup-external-alertmanager.sh
+./grafana/provisioning/datasources/setup-external-alertmanager.sh
+
 ```
 
 ### Генерация CSV файла. 
@@ -25,40 +31,37 @@ podman ps -a
 clear
 chmod +x ./compose-generate-testdata.sh
 OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdata.sh
-# ctrl+c
-# ps aux | grep '[c]ompose-generate-testdata' и потом kill -9 <pid>
+```
+```shell
+# остановка генерации 
+# ctrl+c 
+# или ps aux и потом через kill -9 <pid>
+clear
+ps aux | grep '[c]ompose-generate-testdata' 
 ```
 
 ### Демонстрация Grafana Alerting
-### Включение доставки алертов во внешний Alertmanager
-Используем контейнер `netshoot` для включения доставки Grafana-managed alerts во внешний Alertmanager.
+#### Включение доставки алертов во внешний Alertmanager
+Если не включили при запуске. Включение доставки Grafana-managed alerts во внешний Alertmanager.
 или можно вручную в настройках Home -> Alerting -> Settings -> нажать Enable "prometheus-alertmanager-datasource"
 ```shell
-podman exec -it netshoot sh -c '
-GRAFANA_PASS=${GRAFANA_ADMIN_PASSWORD:-admin}
-until curl -fsS -u "admin:$GRAFANA_PASS" http://grafana:3000/api/health >/dev/null; do
-  echo "Waiting for Grafana..."
-  sleep 2
-done
-curl -fsS -u "admin:$GRAFANA_PASS" \
-  -H "Content-Type: application/json" \
-  -X POST http://grafana:3000/api/v1/ngalert/admin_config \
-  -d "{\"alertmanagersChoice\":\"all\"}"
-'
+clear
+chmod +x ./grafana/provisioning/datasources/setup-external-alertmanager.sh
+./grafana/provisioning/datasources/setup-external-alertmanager.sh
 ```
-### Проверка включения "prometheus-alertmanager-datasource"
+#### Проверка включения "prometheus-alertmanager-datasource"
 Можно вручную в настройках Home -> Alerting -> Settings -> нажать Enable "prometheus-alertmanager-datasource"
 или проверить через интерфейс:
 ```shell
 open http://localhost:3000/alerting/admin/alertmanager
 ```
-### Сделать Alert editable, если нужно.
+#### Сделать Alert editable, если нужно.
 ```shell
 clear
 chmod +x ./compose-generate-testdata.sh
 ./grafana/provisioning/alerting/create-editable-nginx-alert.sh
 ```
-### Действия по алертам
+#### Действия по алертам
 ```shell
 # отключаем сервис
 clear
