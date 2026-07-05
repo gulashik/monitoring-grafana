@@ -1,3 +1,25 @@
+### UI 
+```shell
+# prometheus
+open http://localhost:9090/targets
+# prometheus federation(prometheus который собирает метрики из другого prometheus)
+open http://localhost:9099/targets
+
+# grafana
+# по умолчанию так и есть login: admin pass: admin
+open http://localhost:3000
+
+# pushgateway
+open http://localhost:9091
+
+# allertmanager общая ссылка
+open http://localhost:9093
+# notify от allertmanager по prometheus
+open http://localhost:8888/prometheus-alerts
+# notify от allertmanager по grafana
+open http://localhost:8888/grafana-alerts
+```
+
 ### Остановить и удалить + удалить volume с данными
 ```shell
 podman compose down -v
@@ -113,33 +135,7 @@ clear
 curl --request GET -sL \
      --url 'http://localhost:9100/metrics'
 ```
-```shell
-# prometheus
-open http://localhost:9090/targets
-```
-```shell
-# prometheus federation(prometheus который собирает метрики из другого prometheus)
-open http://localhost:9099/targets
-```
-```shell
-# grafana
-# по умолчанию так и есть login: admin pass: admin
-open http://localhost:3000
-```
 
-```shell
-# allertmanager 
-open http://localhost:9093
-```
-```shell
-# notify от allertmanager
-open http://localhost:8888/prometheus-alerts
-```
-
-```shell
-# pushgateway
-open http://localhost:9091
-```
 ```shell
 # Отправка в Pushgateway
 # Prometheus метрики представлены в виде специальных комментариев HELP и TYPE, 
