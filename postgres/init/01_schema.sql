@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS business_metrics (
-    day TIMESTAMP PRIMARY KEY,
+    day TIMESTAMPTZ PRIMARY KEY,
     visitors INTEGER NOT NULL,
     leads INTEGER NOT NULL,
     orders INTEGER NOT NULL,

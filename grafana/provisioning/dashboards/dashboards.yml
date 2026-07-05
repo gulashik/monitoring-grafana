@@ -31,3 +31,13 @@ providers:
     options:
       path: /etc/grafana/provisioning/dashboards/csv-folder # замапили папку provisioning в compose.yml
       foldersFromFilesStructure: false
+  - name: mixed-dashboards
+    orgId: 1
+    folder: Mixed
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/mixed-folder # замапили папку provisioning в compose.yml
+      foldersFromFilesStructure: false

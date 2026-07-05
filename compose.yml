@@ -166,6 +166,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: metrics_db
+      TZ: Europe/Moscow
     volumes:
       # накатываем скрипты при старте
       - ./postgres/init:/docker-entrypoint-initdb.d:ro
@@ -187,6 +188,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
+      TZ: Europe/Moscow
     ports:
       - '5433:5432'
     networks:
