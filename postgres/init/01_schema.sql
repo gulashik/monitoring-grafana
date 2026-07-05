@@ -37,40 +37,44 @@ DECLARE
     country_code_3_values TEXT[] := ARRAY['USA', 'GBR', 'DEU', 'FRA', 'BRA', 'IND', 'JPN', 'AUS'];
     department_values TEXT[] := ARRAY['sales', 'support', 'marketing', 'finance', 'platform', 'delivery'];
 BEGIN
-    country_index := floor(random() * array_length(country_code_2_values, 1) + 1);
-    department_index := floor(random() * array_length(department_values, 1) + 1);
+    LOOP
+        country_index := floor(random() * array_length(country_code_2_values, 1) + 1);
+        department_index := floor(random() * array_length(department_values, 1) + 1);
 
-    INSERT INTO grafana_demo_metrics (
-        measured_at,
-        country_code_2,
-        country_code_3,
-        department,
-        active_users,
-        orders,
-        revenue,
-        response_ms,
-        cpu_load,
-        conversion_rate
-    )
-    VALUES (
-        now(),
-        country_code_2_values[country_index],
-        country_code_3_values[country_index],
-        department_values[department_index],
-        floor(random() * 900 + 100)::INTEGER,
-        floor(random() * 80 + 1)::INTEGER,
-        round((random() * 50000 + 1000)::NUMERIC, 2),
-        round((random() * 900 + 50)::NUMERIC, 2),
-        round((random() * 95 + 1)::NUMERIC, 2),
-        round((random() * 0.18 + 0.01)::NUMERIC, 4)
-    );
+        INSERT INTO grafana_demo_metrics (
+            measured_at,
+            country_code_2,
+            country_code_3,
+            department,
+            active_users,
+            orders,
+            revenue,
+            response_ms,
+            cpu_load,
+            conversion_rate
+        )
+        VALUES (
+            now(),
+            country_code_2_values[country_index],
+            country_code_3_values[country_index],
+            department_values[department_index],
+            floor(random() * 900 + 100)::INTEGER,
+            floor(random() * 80 + 1)::INTEGER,
+            round((random() * 50000 + 1000)::NUMERIC, 2),
+            round((random() * 900 + 50)::NUMERIC, 2),
+            round((random() * 95 + 1)::NUMERIC, 2),
+            round((random() * 0.18 + 0.01)::NUMERIC, 4)
+        );
 
-    DELETE FROM grafana_demo_metrics
-    WHERE id IN (
-        SELECT id
-        FROM grafana_demo_metrics
-        ORDER BY measured_at DESC, id DESC
-        OFFSET 1024
-    );
+        DELETE FROM grafana_demo_metrics
+        WHERE id IN (
+            SELECT id
+            FROM grafana_demo_metrics
+            ORDER BY measured_at DESC, id DESC
+            OFFSET 1024
+        );
+
+        PERFORM pg_sleep(random() * 4 + 1);
+    END LOOP;
 END;
 $$;
