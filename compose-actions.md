@@ -52,7 +52,8 @@ chmod +x ./grafana/provisioning/datasources/setup-external-alertmanager.sh
 ```shell
 clear
 chmod +x ./compose-generate-testdata.sh
-OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdata.sh
+OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdata.sh &
+OUTPUT_FILE=./grafana/public/testdata/live_metric2.csv ./compose-generate-testdata.sh &
 ```
 ```shell
 # остановка генерации 
