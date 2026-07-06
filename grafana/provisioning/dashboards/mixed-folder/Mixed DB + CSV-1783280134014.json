@@ -115,7 +115,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT leads, orders, day FROM business_metrics ORDER BY day DESC LIMIT 50 ",
+          "rawSql": "SELECT leads, orders, day FROM business_metrics ORDER BY day DESC LIMIT 1024 ",
           "refId": "A",
           "sql": {
             "columns": [
