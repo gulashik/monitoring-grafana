@@ -31,9 +31,10 @@ podman ps -a
 ### Состояние
 ```shell
 clear
-podman ps -a &&
-ps aux | grep '[c]ompose-generate-testdata' &&
-ps aux | grep '[i]nsert-metrics' &&
+podman ps -a 
+ps aux | grep '[s]etup-external-alertmanager.sh' 
+ps aux | grep '[c]ompose-generate-testdata' 
+ps aux | grep '[i]nsert-metrics' 
 ps aux | grep '[i]nsert-business-metrics' 
 ```
 ```shell

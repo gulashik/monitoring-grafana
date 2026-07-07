@@ -155,7 +155,7 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50
+            "limit": 1024
           },
           "table": "business_metrics"
         },
@@ -189,6 +189,15 @@
             "data": "",
             "method": "GET"
           }
+        },
+        {
+          "datasource": {
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "SELECT A.day, A.orders + 120 as value_calc FROM A",
+          "refId": "C",
+          "type": "sql"
         }
       ],
       "title": "Mixed panel",
@@ -196,10 +205,10 @@
     }
   ],
   "preload": false,
-  "refresh": "",
+  "refresh": "10s",
   "schemaVersion": 42,
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -218,7 +227,7 @@
   },
   "timezone": "Europe/Moscow",
   "title": "Mixed DB + CSV",
-  "version": 2,
-  "uid": "ad4m82q",
-  "id": 2197157894811648
+  "version": 3,
+  "uid": "ad4bv6l",
+  "id": 2484302919380992
 }
