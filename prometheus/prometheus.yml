@@ -33,6 +33,11 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
+  - job_name: "grafana"
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ["grafana:3000"]
+
   - job_name: "node-exporter"
     static_configs:
       - targets: ["node-exporter:9100"] # Используем как адресс node-exporter т.к. в compose указываем сеть

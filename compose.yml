@@ -39,6 +39,7 @@ services:
       GF_SECURITY_ADMIN_USER: "admin"
       # Если Grafana уже запустилась и создала пользователя admin, а потом поменяли переменную — пароль не изменится автоматически, потому что пользователь уже сохранён в базе Grafana.
       GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}" # если пароль не задан, то admin; пробросил через env
+      GF_METRICS_ENABLED: true # включить сбор метрик по endpoint /metrics; curl http://localhost:3000/metrics ; включен по умолчанию
       GF_SECURITY_DISABLE_GRAVATAR: "true" # Gravatar — внешний сервис, который по email может возвращать аватар пользователя
       GF_AUTH_ANONYMOUS_ENABLED: "false" # запретить анонимный доступ
       GF_USERS_ALLOW_SIGN_UP: "false" # пользователей должен создавать Администратор
