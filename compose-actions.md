@@ -49,7 +49,7 @@ ps aux | grep '[c]ompose-generate-testdata'
 ### Запускаем 
 ```shell
 clear
-podman compose up -d
+podman compose --env-file ./config/.env up -d
 
 # включение доставки Grafana-managed alerts во внешний Alertmanager.
 #  или можно вручную в настройках Home - Alerting - Settings - нажать Enable "prometheus-alertmanager-datasource"
