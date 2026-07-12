@@ -2,6 +2,11 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana:13.1.0
+    env_file:
+      # путь относительно compose.yml
+      - path: ./config/.env.grafana # если нужны опции, то можно так
+        required: true
+      - ./config/.env.grafana # или просто путь
     restart: on-failure:3
     volumes:
       # завязались на локальные папку
