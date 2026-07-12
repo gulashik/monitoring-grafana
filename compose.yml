@@ -2,6 +2,7 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana:13.1.0
+    restart: on-failure:3
     volumes:
       # завязались на локальные папку
       - './grafana/image-mapped-folders/grafana-data:/var/lib/grafana'
@@ -36,6 +37,7 @@ services:
       GF_SECURITY_DISABLE_GRAVATAR: "true" # Gravatar — внешний сервис, который по email может возвращать аватар пользователя
       GF_AUTH_ANONYMOUS_ENABLED: "false" # запретить анонимный доступ
       GF_USERS_ALLOW_SIGN_UP: "false" # пользователей должен создавать Администратор
+      # GF_SECURITY_SECRET_KEY: сверх_секретный_ключ_из_32_символов_для_подписи_cookies
       GF_USERS_ALLOW_ORG_CREATE: "false" # запретить создание новых организаций
       GF_DATE_FORMATS_DEFAULT_TIMEZONE: "Europe/Moscow" # фиксировать timezone. Для production удобно "UTC"
       GF_ANALYTICS_REPORTING_ENABLED: "false" # отключить отправку аналитики в Grafana Labs

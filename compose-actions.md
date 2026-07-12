@@ -23,8 +23,10 @@ open http://localhost:8888/grafana-alerts
 
 ### Остановить и удалить + удалить volume с данными
 ```shell
+clear
 podman compose down -v
-rm -rf ./grafana/image-mapped-folders/*
+rm -rf ./grafana/image-mapped-folders && mkdir ./grafana/image-mapped-folders
+rm -rf ./grafana/ini-from-image && mkdir ./grafana/ini-from-image
 podman ps -a
 ```
 
@@ -63,6 +65,9 @@ chmod +x ./postgres/generator/insert-business-metrics.sh
 # генерация CSV файла
 chmod +x ./compose-generate-testdata.sh
 OUTPUT_FILE=./grafana/public/testdata/live_metric.csv ./compose-generate-testdata.sh &
+
+# копируем grafana.ini если нужно будет увидеть его содержимое
+podman cp grafana:/etc/grafana/grafana.ini ./grafana/ini-from-image/grafana.ini
 
 podman ps -a
 ```
