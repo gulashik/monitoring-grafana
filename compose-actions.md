@@ -2,6 +2,8 @@
 ```shell
 # prometheus
 open http://localhost:9090/targets
+# prometheus service discovery 
+open http://localhost:9090/service-discovery
 # prometheus federation(prometheus который собирает метрики из другого prometheus)
 open http://localhost:9099/targets
 

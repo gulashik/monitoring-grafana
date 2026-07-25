@@ -42,9 +42,13 @@ scrape_configs:
     static_configs:
       - targets: ["node-exporter:9100"] # Используем как адресс node-exporter т.к. в compose указываем сеть
 
+  # В отличие от node-exporter выше (static_configs), этот job находит цели через file-based service discovery:
+  # Prometheus периодически перечитывает файл(ы) по пути ниже и обновляет список целей без перезапуска.
   - job_name: "node-exporter2"
-    static_configs:
-      - targets: ["node-exporter2:9100"] # Используем как адресс node-exporter т.к. в compose указываем сеть
+    file_sd_configs:
+      - files:
+          - "/etc/prometheus/file_sd/*.json"
+        refresh_interval: 30s # по умолчанию 5m, укорочено для удоства эксперимента
 
   - job_name: "nginx-exporter"
     static_configs:

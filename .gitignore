@@ -5,6 +5,9 @@ grafana/image-mapped-folders/*
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.claude
+.codex
+openspec
 
 ### STS ###
 .apt_generated
