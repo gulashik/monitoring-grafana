@@ -129,6 +129,80 @@ open http://localhost:3000/alerting/grafana/nginx-exporter-down-grafana/view
 open http://localhost:9090/alerts
 ```
 
+### Демонстрация Grafana Аннотации
+### Аннотации в Grafana
+Есть варианты подтягивания аннотаций в Grafana.
+- Вручную — через интерфейс, просто кликнув на график.
+- Автоматически через API — CI/CD системы, скрипты мониторинга или алерты сами отправляют аннотации при деплоях или срабатывании триггеров.
+- Из источников данных — Grafana может подтягивать аннотации из Prometheus, Elasticsearch, InfluxDB и других источников на основе определённых запросов (например, события из логов).
+- Из алертов — при срабатывании алерта Grafana может автоматически создать аннотацию.
+
+#### Вручную
+Ctrl/Cmd+click (или drag-select) на графике панели → откроется диалог "Add annotation".
+
+#### Автоматически через API
+```shell
+# увидеть аннотации можно через API
+curl -u admin:admin "http://localhost:3000/api/annotations" | jq
+# фильтрация по тегу 
+curl -u admin:admin "http://localhost:3000/api/annotations?tags=deploy" | jq
+# фильтрация по типу 
+curl -u admin:admin "http://localhost:3000/api/annotations?type=alert" | jq
+
+```
+Аннотации можно увидеть в dashboard-е `CSV read`
+```shell
+# одна линия 
+clear
+curl -u admin:admin \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:3000/api/annotations \
+  -d '{
+        "dashboardUID": "ad8whsx",
+        "panelId": 1,
+        "text": "CSV read: test annotation",
+        "tags": ["csv", "manual", "api"],
+        "time": '"$(($(date +%s%N)/1000000))"'
+      }'
+```
+```shell
+# диапазон 1 минута
+clear
+START_MS=$(($(date +%s%N)/1000000))
+END_MS=$((START_MS + 1 * 60 * 1000))
+
+curl -u admin:admin \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:3000/api/annotations \
+  -d '{
+        "dashboardUID": "ad8whsx",
+        "panelId": 1,
+        "text": "CSV read: event interval",
+        "tags": ["csv", "manual", "api", "interval"],
+        "time": '"$START_MS"',
+        "timeEnd": '"$END_MS"'
+      }'
+```
+
+#### Из источников данных
+В dashboard-е `Mixed DB + CSV` будут аннотации
+Создание
+Grafana сама периодически перевыполняет этот запрос и рисует найденные строки как аннотации на графике.
+В UI: открыть дашборд → Dashboard settings → Annotations → New query → Data source `grafana-postgresql-datasource`
+Query:
+```sql
+SELECT
+  measured_at AS time,
+  'High CPU load: ' || cpu_load || '% (' || department || ')' AS text,
+  ARRAY['cpu', department] AS tags
+FROM grafana_demo_metrics
+WHERE cpu_load > 90
+ORDER BY measured_at
+```
+
+#### Из алертов
+
+
 ### Утилиты
 ```shell
 clear

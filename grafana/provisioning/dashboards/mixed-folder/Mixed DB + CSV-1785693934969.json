@@ -12,6 +12,43 @@
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
         "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "ffq7bvja2gsu8d"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "red",
+        "name": "DB annotation",
+        "target": {
+          "dataset": "metrics_db",
+          "editorMode": "code",
+          "expr": "",
+          "format": "table",
+          "interval": "",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  measured_at AS time,\n  'High CPU load: ' || cpu_load || '% (' || department || ')' AS text,\n  ARRAY['cpu', department] AS tags\nFROM grafana_demo_metrics\nWHERE cpu_load > 90\nORDER BY measured_at",
+          "refId": "Anno",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
       }
     ]
   },
@@ -228,6 +265,6 @@
   "timezone": "Europe/Moscow",
   "title": "Mixed DB + CSV",
   "version": 3,
-  "uid": "ad4bv6l",
-  "id": 2484302919380992
+  "uid": "ad4bv6l999",
+  "id": 3313903964291072
 }
